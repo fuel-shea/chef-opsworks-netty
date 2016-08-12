@@ -86,6 +86,8 @@ define :nettyapp_scm do
       else
         raise "unsupported SCM type #{deploy[:scm][:scm_type].inspect}"
       end
+    end
+  end
 
   ruby_block "change HOME back to /root after source checkout" do
     block do
