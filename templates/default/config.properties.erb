@@ -1,0 +1,16 @@
+[default]
+appname=<%= @application_name %>
+version=<%= @revision %>
+deploy_path=<%= @deploy_path %>
+
+[env]
+<% @env_vars.to_hash.each do |k,v| %>
+<%= k.downcase %>=<%= v %>
+<% end %>
+
+<% @config_vars.to_hash.each do |section,values| %>
+[<%= section %>]
+<% values.to_hash.each do |k,v| %>
+<%= k.downcase %>=<%= v %>
+<% end %>
+<% end %>

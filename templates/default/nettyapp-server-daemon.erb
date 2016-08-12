@@ -1,0 +1,56 @@
+#!/bin/sh -e
+
+set -e
+
+. /lib/lsb/init-functions
+
+USER="deploy"
+GROUP="www-data"
+NAME="nettyapp_<%= @application_name %>_server"
+ROOT="<%= @deploy_to %>"
+PIDFILE="$ROOT/shared/pids/nettyapp.pid"
+LOGFILE=<%= @deploy_to %>/shared/log/<%= @application_name %>.log
+
+start() {
+    local options
+    pidfile=$(printf "$PIDFILE")
+
+    run_command="gradle run >> $LOGFILE 2>&1"
+    if start-stop-daemon --start --background --chdir <%= @release_path %> --chuid $USER:$GROUP --make-pidfile --pidfile $pidfile --exec $run_command -- $options
+    then
+        log_daemon_msg "Starting Netty Application: $NAME ..."
+    else
+        log_failure_msg "Failed to start Netty Applicaiton: $NAME!"
+    fi
+}
+
+stop() {
+    local pidfile
+
+    pidfile=$(printf "$PIDFILE")
+
+    if start-stop-daemon --stop --quiet --oknodo --pidfile $pidfile
+    then
+        log_daemon_msg "Stopped Netty Application: $NAME"
+        rm -f $pidfile
+    else
+        log_failure_msg "Failed to stop Netty Application: $NAME!" >&2
+    fi
+}
+
+case $1 in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        echo "Sleeping..."; sleep 1 ;
+        start
+        ;;
+   *)  
+     echo "usage: nettyapp-<%= @application_name %>-server-daemon {start|stop|restart}" ;;
+esac
+exit 0
