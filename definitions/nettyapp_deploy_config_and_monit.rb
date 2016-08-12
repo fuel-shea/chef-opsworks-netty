@@ -59,11 +59,16 @@ define :nettyapp_deploy_config_and_monit do
     #)
   #end
 
+  puts "\n\n\nnode['java']:\nnode['java']\n\n"
+
   bash "set up go application to use ports 80 and 443" do
     user "root"
     cwd "/tmp"
     code <<-EOH
-      setcap 'cap_net_bind_service=+ep' $(readlink -f #{params[:deploy_to]}/current/bin/nettyapp_#{params[:application_name]}_server)
+      setcap 'cap_net_bind_service=+ep' #{node['java']['java_home']}/bin/java
+      setcap 'cap_net_bind_service=+ep' #{node['java']['java_home']}/jre/bin/java
+      patchelf --set-rpath #{node['java']['java_home']}/jre/lib/amd64/jli #{node['java']['java_home']}/jre/bin/java
+      patchelf --set-rpath #{node['java']['java_home']}/lib/amd64/jli #{node['java']['java_home']}/bin/java
     EOH
   end
 
