@@ -59,7 +59,7 @@ define :nettyapp_deploy_config_and_monit do
     #)
   #end
 
-  puts "\n\n\nnode['java']:\nnode['java']\n\n"
+  puts "\n\n\nnode['java']:\n#{node['java']}\n\n"
 
   bash "set up go application to use ports 80 and 443" do
     user "root"
